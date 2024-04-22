@@ -1,0 +1,33 @@
+/* styles.css */
+
+/* Typography */
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+/* Layout */
+header, footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+main {
+    margin: 20px;
+}
+
+/* Interactive Elements */
+button, a {
+    background-color: #0074D9;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* Accessibility */
+img {
+    max-width: 100%;
+    height: auto;
+}

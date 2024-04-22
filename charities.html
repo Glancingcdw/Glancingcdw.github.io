@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <title>HelpHub - Charities List</title>
+    <style>
+        /* Simple styling for the organization data */
+        .organization {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .organization h2 {
+            margin-top: 0;
+        }
+        .organization p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="charities.html">Charities List</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+<h1>List of Charities in Your Area:</h1>
+
+<ul id="charity-list">
+    <li class="organization">
+        <a href="charity_profile.html">The Nature Conservancy</a>
+        <p>The Nature Conservancy is a global environmental organization that works to protect the lands and waters on which all life depends. They focus on conserving critical habitats, addressing climate change, and promoting sustainable practices.</p>
+    </li>
+    <li class="organization">
+        <a href="charity_profile.html">Feeding America</a>
+        <p>Feeding America is the largest hunger-relief organization in the United States. Through a network of more than 200 food banks, they provide meals to tens of millions of people in need. They also support programs to prevent food waste and improve food security.</p>
+    </li>
+    <li class="organization">
+        <a href="charity_profile.html">American Red Cross</a>
+        <p>The American Red Cross provides emergency assistance, disaster relief, and disaster preparedness education in the United States. They help people affected by disasters big and small, and their mission is to alleviate human suffering and ensure respect for all human beings.</p>
+    </li>
+    <!-- More charities will be added here by the JavaScript code -->
+</ul>
+
+<a href="index.html">Back to Home Page</a>
+
+</main>
+
+<footer>© 2022 HelpHub, All Rights Reserved.</footer>
+
+<script>
+    // Function to fetch nonprofit organizations data
+    async function fetchOrganizations() {
+        try {
+            const response = await fetch('https://charitybase.uk/api/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Apikey 1bef1adb-b3b4-426c-a0e4-af37298ee556'
+                },
+                body: JSON.stringify({
+                    query: `{
+                        CHC {
+                            getCharities(filters: { search: "green", finances: { latestIncome: { gte: 100000 } } }) {
+                                count
+                                aggregate {
+                                    geo {
+                                        region {
+                                            buckets {
+                                                key
+                                                name
+                                                count
+                                            }
+                                        }
+                                    }
+                                }
+                                list(limit: 10) {
+                                    id
+                                    names {
+                                        value
+                                    }
+                                    activities
+                                }
+                            }
+                        }
+                    }`
+                })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching organizations:', error);
+        }
+    }
+
+    // Function to display nonprofit organizations data on the HTML page
+    async function displayOrganizations() {
+        const organizationsContainer = document.getElementById('charity-list');
+        const organizations = await fetchOrganizations();
+
+        // Check if data is fetched successfully
+        if (organizations && organizations.data) {
+            organizations.data.CHC.getCharities.list.forEach(org => {
+                const orgElement = document.createElement('li');
+                orgElement.classList.add('organization');
+                orgElement.innerHTML = `
+                    <a href="charity_profile.html">${org.names[0].value}</a>
+                    <p><strong>ID:</strong> ${org.id}</p>
+                    <p><strong>Activities:</strong> ${org.activities}</p>
+                `;
+                organizationsContainer.appendChild(orgElement);
+            });
+        } else {
+            organizationsContainer.innerHTML += '<li class="organization"><p>Failed to fetch additional organizations data. Please try again later.</p></li>';
+        }
+    }
+
+    // Call the displayOrganizations function when the page loads
+    displayOrganizations();
+</script>
+
+</body>
+</html>
+
